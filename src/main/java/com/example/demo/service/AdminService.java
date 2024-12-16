@@ -18,12 +18,16 @@ public class AdminService {
     // TODO: 4. find or save 예제 개선
     @Transactional
     public void reportUsers(List<Long> userIds) {
-        for (Long userId : userIds) {
-            User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("해당 ID에 맞는 값이 존재하지 않습니다."));
+        // 한 번의 쿼리로 모든 사용자 조회
+        List<User> users = userRepository.findAllById(userIds);
 
-            user.updateStatusToBlocked();
-
-            userRepository.save(user);
+        if (users.size() != userIds.size()) {
+            throw new IllegalArgumentException("일부 사용자 ID에 해당하는 값이 존재하지 않습니다.");
         }
+
+        // 상태를 변경
+        users.forEach(User::updateStatusToBlocked);
+
+        // 자동 저장
     }
 }
