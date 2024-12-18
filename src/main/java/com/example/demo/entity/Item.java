@@ -2,11 +2,14 @@ package com.example.demo.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
 
 @Entity
 @Getter
 // TODO: 6. Dynamic Insert
+@DynamicInsert
 public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,7 +27,7 @@ public class Item {
     @JoinColumn(name = "manager_id")
     private User manager;
 
-    @Column(nullable = false, columnDefinition = "varchar(20) default 'PENDING'")
+    @Column(columnDefinition = "varchar(20) default 'PENDING'")
     private String status;
 
     public Item(String name, String description, User manager, User owner) {
