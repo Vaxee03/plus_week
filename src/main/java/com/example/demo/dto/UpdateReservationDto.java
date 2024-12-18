@@ -1,6 +1,6 @@
 package com.example.demo.dto;
 
-import com.example.demo.ReservationStatus;
+import com.example.demo.entity.ReservationStatus;
 import com.example.demo.entity.Reservation;
 import lombok.Getter;
 

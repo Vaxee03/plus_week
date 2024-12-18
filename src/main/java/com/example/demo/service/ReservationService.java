@@ -1,6 +1,6 @@
 package com.example.demo.service;
 
-import com.example.demo.ReservationStatus;
+import com.example.demo.entity.ReservationStatus;
 import com.example.demo.dto.ReservationResponseDto;
 import com.example.demo.dto.UpdateReservationDto;
 import com.example.demo.entity.Item;

@@ -1,6 +1,6 @@
 package com.example.demo.controller;
 
-import com.example.demo.ReservationStatus;
+import com.example.demo.entity.ReservationStatus;
 import com.example.demo.dto.ReservationRequestDto;
 import com.example.demo.service.ReservationService;
 import org.springframework.web.bind.annotation.*;
