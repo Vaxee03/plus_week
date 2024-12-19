@@ -1,14 +1,11 @@
 package com.example.demo.config;
 
-import com.example.demo.entity.Role;
+import com.example.demo.enums.Role;
 import com.example.demo.filter.AuthFilter;
 import com.example.demo.filter.RoleFilter;
 import com.example.demo.interceptor.AdminRoleInterceptor;
 import com.example.demo.interceptor.AuthInterceptor;
 import com.example.demo.interceptor.UserRoleInterceptor;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import jakarta.servlet.Filter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -73,13 +70,5 @@ public class WebConfig implements WebMvcConfigurer {
         filterRegistrationBean.setOrder(Ordered.HIGHEST_PRECEDENCE + 2);
         filterRegistrationBean.addUrlPatterns(ADMIN_ROLE_REQUIRED_PATH_PATTERNS);
         return filterRegistrationBean;
-    }
-
-    @PersistenceContext
-    private EntityManager entityManager;
-
-    @Bean
-    public JPAQueryFactory jpaQueryFactory() {
-        return new JPAQueryFactory(entityManager);
     }
 }

@@ -1,6 +1,6 @@
 package com.example.demo.service;
 
-import com.example.demo.entity.ReservationStatus;
+import com.example.demo.enums.ReservationStatus;
 import com.example.demo.dto.ReservationResponseDto;
 import com.example.demo.dto.UpdateReservationDto;
 import com.example.demo.entity.Item;
@@ -79,20 +79,9 @@ public class ReservationService {
     // TODO: 5. QueryDSL 검색 개선
     public List<ReservationResponseDto> searchAndConvertReservations(Long userId, Long itemId) {
 
-        List<Reservation> reservations = searchReservations(userId, itemId);
+        List<Reservation> reservations = reservationRepository.searchReservation(userId, itemId);
 
         return convertToDto(reservations);
-    }
-
-    public List<Reservation> searchReservations(Long userId, Long itemId) {
-
-        return jpaQueryFactory.select(reservation)
-                .from(reservation)
-                .leftJoin(reservation.user).fetchJoin()
-                .leftJoin(reservation.item).fetchJoin()
-                .where(userId != null ? reservation.user.id.eq(userId) : null,
-                        itemId != null ? reservation.item.id.eq(itemId) : null)
-                .fetch();
     }
 
     private List<ReservationResponseDto> convertToDto(List<Reservation> reservations) {
@@ -109,36 +98,39 @@ public class ReservationService {
 
     // TODO: 7. 리팩토링
     @Transactional
-    public UpdateReservationDto updateReservationStatus(Long reservationId, ReservationStatus status) {
+    public ReservationResponseDto updateReservationStatus(Long reservationId, ReservationStatus status) {
         Reservation reservation = findReservationById(reservationId);
 
-        switch (status) {
+        validateStatusTransition(reservation.getStatus(), status);
+
+        reservation.updateStatus(status);
+
+        return ReservationResponseDto.updateResponseDto(reservation);
+    }
+
+    private void validateStatusTransition(ReservationStatus currentStatus, ReservationStatus newStatus) {
+        switch (newStatus) {
             case APPROVED:
-                if (!ReservationStatus.PENDING.equals(reservation.getStatus())) {
+                if (!ReservationStatus.PENDING.equals(currentStatus)) {
                     throw new IllegalArgumentException("PENDING 상태만 APPROVED로 변경 가능합니다.");
                 }
-                reservation.updateStatus(ReservationStatus.APPROVED);
                 break;
 
             case CANCELED:
-                if (ReservationStatus.EXPIRED.equals(reservation.getStatus())) {
+                if (ReservationStatus.EXPIRED.equals(currentStatus)) {
                     throw new IllegalArgumentException("EXPIRED 상태인 예약은 취소할 수 없습니다.");
                 }
-                reservation.updateStatus(ReservationStatus.CANCELED);
                 break;
 
             case EXPIRED:
-                if (!ReservationStatus.PENDING.equals(reservation.getStatus())) {
+                if (!ReservationStatus.PENDING.equals(currentStatus)) {
                     throw new IllegalArgumentException("PENDING 상태만 EXPIRED로 변경 가능합니다.");
                 }
-                reservation.updateStatus(ReservationStatus.EXPIRED);
                 break;
 
             default:
-                throw new IllegalArgumentException("올바르지 않은 상태: " + status);
+                throw new IllegalArgumentException("올바르지 않은 상태: " + newStatus);
         }
-
-        return new UpdateReservationDto(reservation);
     }
 
     private Reservation findReservationById(Long reservationId) {

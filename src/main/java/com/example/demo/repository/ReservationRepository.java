@@ -8,10 +8,9 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Repository
-public interface ReservationRepository extends JpaRepository<Reservation, Long> {
+public interface ReservationRepository extends JpaRepository<Reservation, Long>, ReservationRepositoryCustom {
 
     List<Reservation> findByUserIdAndItemId(Long userId, Long itemId);
 
@@ -29,6 +28,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             @Param("endAt") LocalDateTime endAt
     );
 
-    @Query("SELECT r FROM Reservation r JOIN FETCH r.user u JOIN FETCH r.item i")
+    // 전체 예약 조회
+    @Query("SELECT distinct r FROM Reservation r JOIN FETCH r.user u JOIN FETCH r.item i")
     List<Reservation> findAllWithUserAndItem();
 }

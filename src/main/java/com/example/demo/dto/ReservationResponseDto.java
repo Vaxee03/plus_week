@@ -1,5 +1,6 @@
 package com.example.demo.dto;
 
+import com.example.demo.entity.Reservation;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
@@ -18,5 +19,15 @@ public class ReservationResponseDto {
         this.itemName = itemName;
         this.startAt = startAt;
         this.endAt = endAt;
+    }
+
+    public static ReservationResponseDto updateResponseDto(Reservation reservation) {
+        return new ReservationResponseDto(
+                reservation.getId(),
+                reservation.getUser().getNickname(),
+                reservation.getItem().getName(),
+                reservation.getStartAt(),
+                reservation.getEndAt()
+        );
     }
 }
